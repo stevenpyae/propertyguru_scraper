@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-import time
+import time, csv
 
 # Configure Chrome options
 chrome_options = Options()
@@ -26,7 +26,8 @@ if "Just a moment" in driver.title:
 # Find listing blocks
 listings = driver.find_elements(By.CSS_SELECTOR, "div.listing-card-root")
 print(f"✅ Found {len(listings)} listings on this page.")
-
+#Initialise a list to store extracted data
+listing_data = []
 # Extract data from each card
 for idx, card in enumerate(listings[:10], 1):  # Limit to first 10 for now
     try:
@@ -74,8 +75,31 @@ for idx, card in enumerate(listings[:10], 1):  # Limit to first 10 for now
             print(f"   {key}: {value}")
         print()
 
-
+        # Append data to the list
+        listing_data.append({
+            "Title": title,
+            "URL": url,
+            "Price": price,
+            "Location": location,
+            "Bedrooms": features["Bedrooms"],
+            "Bathrooms": features["Bathrooms"],
+            "Floor Area": floor_area,
+            "Price per sqft": features["Price per sqft"]
+        })
     except Exception as e:
         print(f"{idx}. ⚠️ Error extracting data: {e}")
 
 driver.quit()
+
+
+# Save to CSV
+csv_file = "propertyguru_listings.csv"
+fieldnames = ["Title", "URL", "Price", "Location","Bedrooms", 
+              "Bathrooms", "Floor Area", "Price per sqft"]
+
+with open(csv_file, mode="w", newline="", encoding="utf-8") as file:
+    writer = csv.DictWriter(file, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(listing_data)
+
+print(f"✅ Successfully saved {len(listing_data)} listings to '{csv_file}'")
