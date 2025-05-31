@@ -27,19 +27,55 @@ if "Just a moment" in driver.title:
 listings = driver.find_elements(By.CSS_SELECTOR, "div.listing-card-root")
 print(f"✅ Found {len(listings)} listings on this page.")
 
-for idx, listing in enumerate(listings[:5], 1):
+# Extract data from each card
+for idx, card in enumerate(listings[:10], 1):  # Limit to first 10 for now
     try:
-        anchor = listing.find_element(By.CSS_SELECTOR, "a.listing-card-link")
-        url = anchor.get_attribute("href")
-        title = anchor.get_attribute("title")
+        
+        # Extracting title and URL
+        link_elem = card.find_element(By.CSS_SELECTOR, "a.listing-card-link")
+        title = link_elem.get_attribute("title")
+        url = link_elem.get_attribute("href")
+        # Extracting price 
+        price_elem = card.find_element(
+            By.CSS_SELECTOR, "div.listing-price")
+        price = price_elem.text.strip()
+        # Extracting location
+        location_elem = card.find_element(
+            By.CSS_SELECTOR, "div.listing-address")
+        location = location_elem.text.strip()
+        # Get feature list
+        feature_list = card.find_elements(
+            By.CSS_SELECTOR, "ul.listing-feature-group li.info-item span.info-value")
+        feature_texts = [f.text.strip()
+                         for f in feature_list if f.text.strip()]
+        # If no features found, use a placeholder
+        if not feature_texts:
+            feature_texts = ["No features listed"]  
 
-        img = listing.find_element(By.CSS_SELECTOR, "img.hui-image-root")
-        image_url = img.get_attribute("src")
+            # Map features with labels based on order
+        features = {
+            "Bedrooms": feature_texts[0] if len(feature_texts) > 0 else "N/A",
+            "Bathrooms": feature_texts[1] if len(feature_texts) > 1 else "N/A",
+            "Floor Area": feature_texts[2] if len(feature_texts) > 2 else "N/A",
+            "Price per sqft": feature_texts[3] if len(feature_texts) > 3 else "N/A"
+        }
 
-        print(f"\n{idx}. {title}")
-        print(f"   🔗 URL: {url}")
-        print(f"   🖼️ Image: {image_url}")
+        # Extract floor area (usually contains 'sqft')
+        floor_area = next((f for f in feature_texts if 'sqft' in f), "N/A")
+        num_features = len(feature_texts)
+
+        print(f"{idx}. {title}")
+        print(f"   🔗 {url}")
+        print(f"   💰 {price}")
+        print(f"   📍 {location}\n")
+        print(f"   📐 Floor Area: {floor_area}")
+        print(f"   🧩 Features Count: {num_features}")
+        for key, value in features.items():
+            print(f"   {key}: {value}")
+        print()
+
+
     except Exception as e:
-        print(f"⚠️ Listing {idx} skipped: {e}")
+        print(f"{idx}. ⚠️ Error extracting data: {e}")
 
 driver.quit()
