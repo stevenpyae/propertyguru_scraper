@@ -13,5 +13,4 @@ My Version: Version 137.0.7151.56 (Official Build) (64-bit)
 
 ## Modify the driver in the scraper.python
 
-
 ## Had issues with pagination

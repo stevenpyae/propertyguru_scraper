@@ -1,5 +1,5 @@
 # Import the RealEstateScraper class from scraper.py
-from scraper import RealEstateScraper
+from scraper.scraper import RealEstateScraper
 
 # This is the main entry point of the program
 if __name__ == "__main__":
