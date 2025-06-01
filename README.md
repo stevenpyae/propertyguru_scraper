@@ -22,16 +22,6 @@ It collects listing details like price, location, floor area, and more, and save
 - 🚫 Ignores listings that fail to load — the scraper continues
 ---
 
-## 📁 Project Structure
-
-propertyguru_scraper/
-├── scraper/
-│ ├── scraper.py # Main scraping script
-│ └── user_agents.txt # Text file with different browser user-agent strings
-├── output/
-│ └── propertyguru_listings.csv # Output file
-└── README.md
-
 ## 🛠️ Setup Instructions (Terminal)
 
 ### 1. Clone the Repository
