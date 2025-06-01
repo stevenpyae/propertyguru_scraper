@@ -39,9 +39,13 @@ pip install -r requirements.txt
 python scraper.py
 
 ### 5. Check output 
-Successful Extraction : [INFO] Saved 400 records to output/books.csv  
+Successful Extraction : [INFO] Saved 400 records to output/propertyguru_listings.csv  
 Check output/books.csv
 
 ### 6. Review
-Current set for 20 pages, Modify the below data to your desired outcome  
---scraper.py Line 74: book_data = scrape_books(max_pages=20)  # Scrape up to 20 pages (400 books max)
+Current set for 200 records, Modify the below data to your desired outcome  
+--scraper.py Line 115: max_records = 200  # Scrape more than equal to 200 records minimum
+
+### Disclaimer
+Program uses a brute force approach to avoid CloudFlare "Are You Human" check.  
+Therefore, Program may take about 10-15 mins for the run. Please change the max records lesser to shorten the processing time. 
