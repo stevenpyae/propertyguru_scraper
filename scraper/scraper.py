@@ -30,19 +30,17 @@ def scrape_page(page_url, page_number):
         "--disable-blink-features=AutomationControlled")
     driver = webdriver.Chrome(options=chrome_options)
 
-    # Hide webdriver
     driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
         "source": """Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"""
     })
 
+    records_scraped = 0
+    next_page_url = None
+
     try:
-        print(f"🧭 Navigating to page {page_number}: {page_url}")
+        print(f"Navigating to page {page_number}: {page_url}")
         driver.get(page_url)
         time.sleep(random.uniform(5, 8))
-
-        if "Verify" in driver.title or "human" in driver.page_source.lower():
-            print("⚠️ CAPTCHA detected. Solve manually.")
-            input("🔓 Press Enter after CAPTCHA is solved...")
 
         WebDriverWait(driver, 15).until(
             EC.presence_of_all_elements_located(
@@ -65,7 +63,8 @@ def scrape_page(page_url, page_number):
                     By.CSS_SELECTOR, "div.listing-address").text.strip()
 
                 feature_list = card.find_elements(
-                    By.CSS_SELECTOR, "ul.listing-feature-group li.info-item span.info-value")
+                    By.CSS_SELECTOR, "ul.listing-feature-group li.info-item span.info-value"
+                )
                 feature_texts = [f.text.strip()
                                  for f in feature_list if f.text.strip()]
 
@@ -87,43 +86,45 @@ def scrape_page(page_url, page_number):
                     "Price per sqft": features["Price per sqft"]
                 })
 
+                records_scraped += 1
                 print(f"✅ Listing {idx}: {title[:50]}...")
 
             except Exception as e:
                 print(f"⚠️ Error on listing {idx}: {e}")
 
-        # Get next page URL
         try:
             next_button = driver.find_element(
                 By.CSS_SELECTOR, "a[da-id='hui-pagination-btn-next']")
             if "disabled" not in next_button.get_attribute("class"):
                 next_page_url = next_button.get_attribute("href")
-            else:
-                next_page_url = None
         except:
             next_page_url = None
 
     except Exception as e:
         print(f"🚨 Error scraping page {page_number}: {e}")
-        next_page_url = None
     finally:
         driver.quit()
 
-    return next_page_url
+    return records_scraped, next_page_url
 
 
 # ---------- Main Scraping Loop ----------
 current_url = "https://www.propertyguru.com.sg/property-for-sale"
-for page_num in range(1, max_pages + 1):
-    next_url = scrape_page(current_url, page_num)
-    if not next_url:
-        print("🚧 No further pages.")
-        break
+page_num = 1
+total_records = 0
+max_records = 200
+
+while total_records < max_records:
+    records_scraped, next_url = scrape_page(current_url, page_num)
+    total_records += records_scraped
+    print(f"📦 Total listings collected: {total_records}")
     current_url = next_url
-    time.sleep(random.uniform(10, 15))  # Sleep before restarting next session
+    page_num += 1
+    #  To trick the website into thinking we are a human, we will wait for a random time between 10 to 15 seconds before scraping the next page.
+    time.sleep(random.uniform(10, 15))
 
 # ---------- Save Results ----------
-csv_file = "propertyguru_listings.csv"
+csv_file = "output/propertyguru_listings.csv"
 with open(csv_file, mode="w", newline="", encoding="utf-8") as file:
     writer = csv.DictWriter(file, fieldnames=[
         "Title", "URL", "Price", "Location", "Bedrooms", "Bathrooms", "Floor Area", "Price per sqft"])
