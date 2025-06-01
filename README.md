@@ -25,11 +25,11 @@ It collects listing details like price, location, floor area, and more, and save
 ## 🛠️ Setup Instructions (Terminal)
 
 ### 1. Clone the Repository
-git clone https://github.com/stevenpyae/propertyguru_scraper.git
-cd BookScraper
+git clone https://github.com/stevenpyae/propertyguru_scraper.git  
+cd propertyguru_scraper
 
 ### 2. Create Virtual Environment (Optional but Recommended)
-python -m venv venv
+python -m venv venv  
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 ### 3. Install Dependencies
@@ -39,9 +39,9 @@ pip install -r requirements.txt
 python scraper.py
 
 ### 5. Check output 
-Successful Extraction : [INFO] Saved 400 records to output/books.csv
+Successful Extraction : [INFO] Saved 400 records to output/books.csv  
 Check output/books.csv
 
 ### 6. Review
-Current set for 20 pages, Modify the below data to your desired outcome
+Current set for 20 pages, Modify the below data to your desired outcome  
 --scraper.py Line 74: book_data = scrape_books(max_pages=20)  # Scrape up to 20 pages (400 books max)
